@@ -1,153 +1,220 @@
-# Semiconductor Wafer Supply Chain: Robust & Adaptive Optimization
+# Semiconductor E2E Manufacturing Optimization
 
-An interactive application that formulates, solves, and simulates robust optimization models for a fabless semiconductor wafer supply chain under uncertainty. Built to make the math behind robust optimization tangible -- showing how different scenarios play out and why protecting against uncertainty is worth the cost.
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-FF4B4B?logo=streamlit&logoColor=white)
+![CVXPY](https://img.shields.io/badge/CVXPY-optimization-2C7FB8)
+![Validation](https://img.shields.io/badge/Validation-passing-brightgreen)
+![Focus](https://img.shields.io/badge/Focus-robust%20optimization-6A1B9A)
 
-## The Problem
+Interactive Streamlit app for semiconductor wafer supply-chain optimization under uncertainty. It turns a fabless sourcing problem into a concrete end-to-end workflow: formulate the model, solve nominal and robust variants, then simulate outcomes across thousands of scenarios.
 
-**Fabless** semiconductor companies (Qualcomm, MediaTek, etc.) design chips but own no fabrication plants. They source wafers from external fabs and must navigate a complex supply chain: fabrication, wafer testing, assembly/packaging, final test, and delivery to OEMs.
+The project is inspired by the included operations research references and `ProjectReport.pdf`, but it is not a line-by-line reproduction of the report appendix. The goal is to make robust and adaptive optimization tangible, not just theoretical.
 
-Two sourcing models are available from each fab:
+## App preview
 
-| | KGD (Known Good Die) | WB (Wafer Buy) |
-|---|---|---|
-| **Pricing** | Fixed cost per wafer (yield risk on fab) | Lower cost per wafer (yield risk on buyer) |
-| **Testing** | Fab handles all testing logistics | Buyer handles testing, needs probe card hardware |
-| **Partial dies** | No access to partially good dies | Can harvest partial dies for extra revenue |
-| **When preferred** | Lower demand (simpler, less risk) | Higher demand (cheaper per die at scale) |
+![App preview](docs/app-preview.svg)
 
-The company must decide how many wafers to buy from each supplier under each model, while facing uncertainty in:
-- **Yield** -- how many good dies each wafer produces
-- **Testing costs** -- WB overhead varies with wafer quality
-- **Downstream costs** -- packaging, final test, QA costs
-- **Partial-die revenue** -- uncertain market for imperfect chips
+_Schematic dashboard preview showing the sidebar controls, optimization views, uncertainty analysis, and Monte Carlo evaluation flow._
 
-The question: how do you allocate wafers across suppliers and models to maximize profit while protecting against these uncertainties?
+## What this demonstrates
 
-## What's Built
+- How wafer allocation changes with demand, yield risk, and cost uncertainty
+- The tradeoff between nominal profit and worst-case protection
+- The difference between static robust planning and two-stage adaptive recourse
+- How Monte Carlo simulation changes the discussion from a single optimal plan to a distribution of outcomes
 
-### Optimization Engine
+## Problem setup
 
-Three optimization formulations, all using the same 5-dimensional Bertsimas-Sim budget uncertainty set `Z = { z in R^5 : |z_i| <= 1, sum |z_i| <= Gamma }`:
+A fabless semiconductor company sources wafers from two suppliers using two sourcing models:
 
-**Nominal** -- deterministic MIP. No uncertainty protection. Solves `max Revenue - Cost` subject to demand and capacity constraints. Baseline for comparison.
+- `KGD` (Known Good Die): simpler operationally, higher effective unit cost, lower yield risk on the buyer
+- `WB` (Wafer Buy): lower wafer price, but the buyer absorbs more testing/handling complexity and yield uncertainty
 
-**Static Robust (Bertsimas-Sim)** -- all decisions made before any uncertainty is revealed. Uses the B-S LP reformulation with auxiliary variables over the full 5D set. Both the demand feasibility constraint and the profit guarantee are protected under one shared budget. Epigraph form: `max t` subject to `nominal_profit - protection >= t`. Solved as MIP with HiGHS.
+The decision is how many wafers to buy from each supplier and sourcing model while facing uncertainty in:
 
-**Two-Stage Adaptive** -- stage-1 commits wafers and hardware; after observing yield (z1, z2), stage-2 chooses fulfillment, salvage, and lost sales. Cost/revenue parameters (z3-z5) remain adversarial and unobserved. Uses vertex enumeration over the full 5D budget set with proper fractional-Gamma support. Nonanticipativity enforced: same yield observation implies same recourse action. Per-vertex profit constraints use the full (z3, z4, z5) cost realization. Solved as MIP with HiGHS.
+- Yield
+- WB overhead cost
+- Downstream cost
+- Extra revenue from partially good dies
 
-Additionally, an **Ellipsoidal (approximate)** formulation is included for comparison. It uses an SOCP demand constraint (`rho * ||deviation_vec||_2`) solved via CLARABEL with LP relaxation + rounding. Labeled as approximate throughout.
+## Models included
 
-### Monte Carlo Simulator
+### 1. Nominal
 
-Evaluates any allocation against thousands of random scenarios:
-- Yield randomness driven by supplier-level `yield_std / yield_mean` (physical process variation, separate from robust set widths)
-- Cost/revenue randomness driven by the set-width parameters
-- **Shortage-aware revenue**: `revenue = price * min(produced, demand)` -- you can't sell what you didn't make
-- **Adaptive payoff**: includes salvage revenue (30% of selling price) and lost-sales penalty (150%)
-- Reports demand-met %, expected/worst-case/VaR/CVaR profit, surplus distribution
+Deterministic mixed-integer model with no uncertainty protection. This is the baseline plan.
 
-### Interactive Dashboard (Streamlit)
+### 2. Static robust
 
-Five tabs:
+Bertsimas-Sim budgeted robust optimization over a shared 5D uncertainty set:
 
-1. **Supply Chain Overview** -- interactive Plotly flow diagram, KGD vs WB explanation, supplier parameter tables, LaTeX formulation
-2. **Optimization Results** -- side-by-side comparison of all four formulations (Nominal, Static Robust, Ellipsoidal, Two-Stage Adaptive) with cost breakdowns and demand sweep charts
-3. **Uncertainty Analysis** -- 2D visualization of the B-S budget polytope vs ellipsoid, Gamma sweep showing cost-of-robustness curve
-4. **Monte Carlo Simulation** -- profit distribution histograms, demand fulfillment ratios, detailed statistics table comparing all formulations
-5. **Sensitivity & Insights** -- tornado chart of parameter sensitivity, cost-of-robustness across demand levels, documented limitations
+`Z = { z in R^5 : |z_i| <= 1, sum_i |z_i| <= Gamma }`
 
-All supplier parameters, cost structures, uncertainty set widths, and simulation settings are tunable from the sidebar.
+The static model chooses all wafer and hardware decisions before uncertainty is revealed. It protects both:
 
-### Validation Suite
+- demand feasibility
+- a worst-case profit lower bound
 
-85 automated checks (`python validate.py`) covering:
-- Solver optimality and capacity constraint satisfaction across 7 demand levels
-- Gamma=0 reproduces nominal solution
-- Gamma monotonicity (robust objective non-increasing)
-- Yield model consistency between optimizer and simulator
-- Shortage revenue capping
-- Adaptive cost sensitivity (downstream and yield set widths change the objective)
-- Fractional Gamma vertex correctness
-- Policy consistency at the nominal scenario
-- App-path smoke tests (UncertaintyConfig construction doesn't crash)
+under the same uncertainty family.
 
-## Tech Stack
+### 3. Two-stage adaptive
 
-| Component | Technology |
-|---|---|
-| Optimization | [cvxpy](https://www.cvxpy.org/) with HiGHS (MIP) and CLARABEL (SOCP) solvers |
-| Dashboard | [Streamlit](https://streamlit.io/) |
-| Visualization | [Plotly](https://plotly.com/python/) |
-| Numerics | NumPy, SciPy, Pandas |
-| Language | Python 3.10+ |
+Stage 1 commits wafers and hardware. Stage 2 reacts after observing yield only. Cost and revenue uncertainty remain adversarial and unobserved.
 
-## Project Structure
+Recourse decisions include:
 
-```
-semiconductor-wafer-robust-optimization/
-├── app.py                 # Streamlit dashboard (5 tabs, sidebar controls)
-├── validate.py            # 85-check validation suite
-├── requirements.txt
-├── src/
-│   ├── model.py           # Data classes: suppliers, costs, uncertainty, results
-│   ├── optimizer.py        # Nominal + static robust + ellipsoidal solvers
-│   ├── adaptive.py         # Two-stage adaptive solver (vertex enumeration)
-│   ├── simulator.py        # Monte Carlo scenario generation + evaluation
-│   └── visualization.py    # Plotly chart functions
-```
+- fulfillment
+- salvage
+- lost sales
 
-## Setup
+This model is solved by vertex enumeration of the same 5D Bertsimas-Sim set, with nonanticipativity enforced by observed yield state.
 
-```bash
-pip install -r requirements.txt
-python -m streamlit run app.py
-```
+### 4. Ellipsoidal (approximate)
 
-To run the validation suite:
+An approximate ellipsoidal robust formulation is included for comparison. It is explicitly labeled approximate in the app.
+
+## App walkthrough
+
+The Streamlit dashboard has five tabs:
+
+1. `Supply Chain Overview`
+2. `Optimization Results`
+3. `Uncertainty Analysis`
+4. `Monte Carlo Simulation`
+5. `Sensitivity & Insights`
+
+From the sidebar you can adjust:
+
+- supplier capacities and cost structure
+- yield means and standard deviations
+- robust set widths
+- `Gamma` / `Rho`
+- Monte Carlo sample count and seed
+
+## Monte Carlo simulation
+
+The simulator evaluates solved allocations under random scenarios.
+
+- Yield randomness comes from supplier-level `yield_mean` and `yield_std`
+- Cost and revenue randomness use the configurable set-width inputs
+- Static solutions use shortage-aware revenue: you cannot sell more dies than you produce
+- Adaptive solutions use a recourse payoff with fulfillment, salvage, and lost-sales penalty
+
+Reported outputs include:
+
+- expected profit
+- worst-case / best-case observed profit
+- VaR / CVaR style risk metrics
+- demand-met percentage
+- surplus / deficit behavior
+
+## Validation
+
+Run:
 
 ```bash
 python validate.py
 ```
 
-## Default Parameters
+The validation suite checks:
 
-Derived from the ProjectReport's formulation and results tables (independently parameterized, not a direct reproduction):
+- nominal, robust, ellipsoidal, and adaptive solver sanity
+- Gamma monotonicity
+- `Gamma = 0` consistency with the nominal model
+- optimizer / simulator yield consistency
+- shortage revenue behavior
+- adaptive sensitivity to set widths
+- fractional-Gamma handling
+- app-path configuration smoke tests
 
-| Parameter | Supplier A (Premium) | Supplier B (Economy) |
-|---|---|---|
-| KGD capacity | 17,500 wafers/qtr | 30,000 wafers/qtr |
-| WB capacity | 7,500 wafers/qtr | 20,000 wafers/qtr |
-| KGD cost | $22,500/wafer | $15,750/wafer |
-| WB cost | $20,000/wafer | $15,000/wafer |
-| Good dies/wafer | 882 | 705 |
-| Yield mean / std | 0.92 / 0.03 | 0.85 / 0.06 |
-| Extra revenue (WB) | $787.50/wafer | $656.25/wafer |
+## Tech stack
 
-Fixed costs: test $2,000/wafer, transport $80/wafer, engineering $5/wafer, hardware piece $300,000, selling price $35/die, downstream $7/die.
+- Python
+- Streamlit
+- CVXPY
+- HiGHS
+- CLARABEL
+- NumPy
+- Pandas
+- Plotly
+- SciPy
 
-## Key Insights
+## Quick start
 
-**KGD dominates at low demand.** Below ~20M dies, Supplier B's KGD model alone satisfies demand at the lowest per-die cost ($22.34). The Wafer Buy model only enters when KGD capacity is exhausted.
+Install dependencies:
 
-**Robustness costs 5-15% but eliminates shortfall risk.** The static robust solution orders more wafers (5-11% surplus) at higher total cost. In exchange, it guarantees demand is met even under worst-case yield within the uncertainty set.
+```bash
+pip install -r requirements.txt
+```
 
-**The adaptive model improves worst-case profit significantly.** By observing yield before deciding fulfillment vs salvage, the two-stage model achieves a substantially higher worst-case guaranteed profit than the static model with the same uncertainty family.
+Run the app:
 
-**Yield uncertainty is the dominant risk factor.** Sensitivity analysis shows yield set width has the largest impact on both the allocation decision and the robust objective, consistent with industry experience where fab yield excursions are the primary supply chain risk.
+```bash
+python -m streamlit run app.py
+```
 
-**Supplier diversification increases with uncertainty.** At higher Gamma, the optimizer spreads allocation across both suppliers and both sourcing models, providing natural hedging against correlated disruptions.
+## Example results
 
-## Known Limitations
+Using the bundled default parameters:
 
-- **Static vs adaptive payoffs differ.** The static model caps revenue at `min(produced, demand) * price`. The adaptive model adds salvage revenue (30%) and lost-sales penalty (150%). Their robust objectives are not directly comparable.
-- **Ellipsoidal is approximate.** LP relaxation + rounding, not exact mixed-integer SOCP.
-- **Independently parameterized.** Inspired by the ProjectReport but uses independently derived parameters. Results do not reproduce the appendix tables exactly.
-- **No contractual penalties.** Neither model captures contract-specific penalties, reputation damage, or expediting costs beyond the stylized lost-sales parameter.
-- **Single-period model.** Plans for one quarter. No multi-period inventory dynamics or demand forecasting.
+| Scenario | Example result |
+|---|---|
+| `10M` demand, nominal | Uses Supplier B `KGD` only: `(KGD-A, KGD-B, WB-A, WB-B) = (0, 14185, 0, 0)` |
+| `30M` demand, nominal | `30.00M` good dies and about `$156.3M` nominal profit |
+| `30M` demand, static robust, `Gamma = 1.0` | `32.12M` good dies, about `$94.1M` nominal profit, about `$51.9M` worst-case guarantee |
+| `30M` demand, Monte Carlo, 5,000 scenarios | Demand met in about `49.0%` of nominal scenarios, `91.2%` for static robust, and `88.1%` for adaptive |
+| `50M` demand, nominal | Uses all four channels: `(9224, 30000, 7500, 20000)` |
+
+The adaptive model uses a different payoff definition from the static model because it includes salvage and lost-sales penalty. Treat adaptive profit figures as decision-support outputs for that formulation, not direct apples-to-apples replacements for the static objective.
+
+## Repository structure
+
+```text
+.
+|-- app.py
+|-- validate.py
+|-- requirements.txt
+|-- ProjectReport.pdf
+|-- ROText.pdf
+`-- src/
+    |-- model.py
+    |-- optimizer.py
+    |-- adaptive.py
+    |-- simulator.py
+    `-- visualization.py
+```
+
+## Default scenario
+
+The bundled default instance uses:
+
+- two suppliers: premium and economy
+- KGD and WB capacity limits for each supplier
+- nominal good-dies-per-wafer assumptions
+- yield mean / standard deviation for simulation
+- fixed WB testing, transport, engineering, hardware, selling-price, and downstream cost parameters
+
+These defaults are independently parameterized from the project report and are meant to support interactive experimentation.
+
+## How to interpret results
+
+- `Nominal Profit` is the value of a plan under nominal coefficients
+- `Robust Objective` is the worst-case guaranteed objective for the robust formulation
+- For adaptive results, the payoff definition differs from the static model because salvage and lost-sales penalty are modeled explicitly
+
+That means static and adaptive robust-objective values are informative, but not strictly apples-to-apples.
+
+## Known limitations
+
+- The adaptive model observes yield only, not realized cost / revenue coefficients
+- The ellipsoidal formulation is approximate
+- The project is single-period, not multi-period
+- The model does not capture every real-world contract feature, expedite option, or reputation effect
+- The app is inspired by the provided report and textbooks, not intended as an exact reproduction of published appendix tables
 
 ## References
 
-- Bertsimas, D. & den Hertog, D. *Robust and Adaptive Optimization* (ROText.pdf) -- uncertainty sets, B-S budget formulation, adaptive robust optimization
-- Bertsimas, D. & Tsitsiklis, J.N. *Introduction to Linear Optimization* -- LP/MIP foundations
-- Boyd, S. & Vandenberghe, L. *Convex Optimization* (bv_cvxbook) -- SOCP, ellipsoidal constraints
-- ProjectReport.pdf -- original problem formulation for fabless semiconductor wafer supply chain optimization
+- `ProjectReport.pdf`
+- `ROText.pdf`
+- `bv_cvxbook.pdf`
+- `bv_cvxslides.pdf`
+- `Introduction to Linear Optimization` by Bertsimas and Tsitsiklis

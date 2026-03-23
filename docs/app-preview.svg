@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Semiconductor optimization dashboard preview</title>
+  <desc id="desc">Schematic preview of the Streamlit dashboard showing sidebar controls, optimization tabs, and simulation outputs.</desc>
+
+  <rect width="1200" height="680" fill="#f6f4ef"/>
+  <rect x="20" y="20" width="1160" height="640" rx="24" fill="#fffdf8" stroke="#d8d0c2" stroke-width="2"/>
+
+  <text x="44" y="60" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#182026">
+    Semiconductor E2E Manufacturing Optimization
+  </text>
+  <text x="44" y="90" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#5b6570">
+    Streamlit dashboard preview: nominal, static robust, ellipsoidal, adaptive, and Monte Carlo views
+  </text>
+
+  <rect x="44" y="120" width="230" height="500" rx="18" fill="#183153"/>
+  <text x="64" y="154" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#ffffff">
+    Sidebar Controls
+  </text>
+
+  <rect x="62" y="176" width="194" height="58" rx="12" fill="#264b7b"/>
+  <text x="78" y="210" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Demand level</text>
+
+  <rect x="62" y="246" width="194" height="76" rx="12" fill="#264b7b"/>
+  <text x="78" y="278" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Supplier capacities</text>
+  <text x="78" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">and cost inputs</text>
+
+  <rect x="62" y="334" width="194" height="86" rx="12" fill="#264b7b"/>
+  <text x="78" y="366" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Yield mean / std</text>
+  <text x="78" y="388" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Set widths</text>
+
+  <rect x="62" y="432" width="194" height="76" rx="12" fill="#264b7b"/>
+  <text x="78" y="464" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Gamma / Rho</text>
+  <text x="78" y="486" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Uncertainty family</text>
+
+  <rect x="62" y="520" width="194" height="82" rx="12" fill="#264b7b"/>
+  <text x="78" y="552" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Monte Carlo runs</text>
+  <text x="78" y="574" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff">Random seed</text>
+
+  <rect x="306" y="120" width="850" height="56" rx="16" fill="#efe8db" stroke="#d8d0c2"/>
+  <text x="330" y="154" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="600" fill="#3d4650">
+    Tabs: Supply Chain Overview • Optimization Results • Uncertainty Analysis • Monte Carlo Simulation • Sensitivity & Insights
+  </text>
+
+  <rect x="306" y="200" width="255" height="180" rx="18" fill="#f6d9c7" stroke="#dfb090"/>
+  <text x="326" y="236" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#5a2d0c">
+    Optimization Results
+  </text>
+  <rect x="326" y="258" width="95" height="42" rx="10" fill="#ffffff"/>
+  <rect x="432" y="258" width="110" height="42" rx="10" fill="#ffffff"/>
+  <rect x="326" y="312" width="95" height="42" rx="10" fill="#ffffff"/>
+  <rect x="432" y="312" width="110" height="42" rx="10" fill="#ffffff"/>
+  <text x="346" y="285" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#5a2d0c">Nominal</text>
+  <text x="450" y="285" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#5a2d0c">Static robust</text>
+  <text x="340" y="339" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#5a2d0c">Ellipsoidal</text>
+  <text x="447" y="339" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#5a2d0c">Adaptive</text>
+
+  <rect x="581" y="200" width="275" height="180" rx="18" fill="#d8ead3" stroke="#9fc08f"/>
+  <text x="603" y="236" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#20421e">
+    Uncertainty Analysis
+  </text>
+  <polygon points="650,336 718,268 786,336 718,364" fill="#ffffff" stroke="#8aa97e" stroke-width="2"/>
+  <ellipse cx="718" cy="312" rx="66" ry="40" fill="none" stroke="#4d7a4b" stroke-width="3"/>
+  <text x="620" y="258" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#20421e">
+    Budget polytope vs ellipsoid
+  </text>
+  <text x="620" y="278" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#20421e">
+    Gamma sweep and cost of robustness
+  </text>
+
+  <rect x="876" y="200" width="280" height="180" rx="18" fill="#d6e5f5" stroke="#96b3d2"/>
+  <text x="898" y="236" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#17365d">
+    Monte Carlo
+  </text>
+  <rect x="904" y="266" width="90" height="84" rx="10" fill="#ffffff" stroke="#96b3d2"/>
+  <rect x="1006" y="266" width="120" height="84" rx="10" fill="#ffffff" stroke="#96b3d2"/>
+  <text x="918" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#17365d">Profit</text>
+  <text x="918" y="312" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#17365d">distribution</text>
+  <text x="1024" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#17365d">Demand-met %</text>
+  <text x="1024" y="312" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#17365d">VaR / CVaR</text>
+
+  <rect x="306" y="406" width="850" height="214" rx="18" fill="#faf7f0" stroke="#d8d0c2"/>
+  <text x="330" y="440" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#333333">
+    Decision Flow
+  </text>
+  <text x="330" y="472" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#555555">
+    Inputs → optimization models → scenario simulation → interpretable outcomes
+  </text>
+
+  <rect x="330" y="500" width="150" height="74" rx="14" fill="#fff3ea" stroke="#dfb090"/>
+  <text x="352" y="530" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600" fill="#5a2d0c">Supplier data</text>
+  <text x="350" y="552" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#5a2d0c">Demand + costs</text>
+
+  <rect x="520" y="500" width="150" height="74" rx="14" fill="#eef6ec" stroke="#9fc08f"/>
+  <text x="547" y="530" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600" fill="#20421e">Solve plan</text>
+  <text x="541" y="552" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#20421e">Nominal / robust</text>
+
+  <rect x="710" y="500" width="170" height="74" rx="14" fill="#edf3fb" stroke="#96b3d2"/>
+  <text x="735" y="530" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600" fill="#17365d">Stress test</text>
+  <text x="728" y="552" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#17365d">Monte Carlo scenarios</text>
+
+  <rect x="920" y="500" width="196" height="74" rx="14" fill="#f8efe4" stroke="#c9a87d"/>
+  <text x="954" y="530" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600" fill="#6b4b1d">Decision support</text>
+  <text x="950" y="552" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#6b4b1d">Profit, risk, service</text>
+
+  <line x1="480" y1="537" x2="520" y2="537" stroke="#9a8f80" stroke-width="4"/>
+  <polygon points="520,537 508,530 508,544" fill="#9a8f80"/>
+
+  <line x1="670" y1="537" x2="710" y2="537" stroke="#9a8f80" stroke-width="4"/>
+  <polygon points="710,537 698,530 698,544" fill="#9a8f80"/>
+
+  <line x1="880" y1="537" x2="920" y2="537" stroke="#9a8f80" stroke-width="4"/>
+  <polygon points="920,537 908,530 908,544" fill="#9a8f80"/>
+</svg>
