@@ -209,12 +209,4 @@ That means static and adaptive robust-objective values are informative, but not 
 - The ellipsoidal formulation is approximate
 - The project is single-period, not multi-period
 - The model does not capture every real-world contract feature, expedite option, or reputation effect
-- The app is inspired by the provided report and textbooks, not intended as an exact reproduction of published appendix tables
-
-## References
-
-- `ProjectReport.pdf`
-- `ROText.pdf`
-- `bv_cvxbook.pdf`
-- `bv_cvxslides.pdf`
-- `Introduction to Linear Optimization` by Bertsimas and Tsitsiklis
+- The app is inspired by the provided report, not intended as an exact reproduction of published appendix tables
