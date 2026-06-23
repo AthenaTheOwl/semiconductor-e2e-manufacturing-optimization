@@ -109,6 +109,27 @@ checks: solver sanity (nominal / robust / ellipsoidal / adaptive), `Γ` monotoni
 - doesn't capture every contract feature, expedite option, or reputation effect
 - inspired by the included `ProjectReport.pdf`; not a line-by-line reproduction
 
+## live demo
+
+Deploy with Streamlit Cloud using:
+
+```text
+streamlit_app.py
+```
+
+Local run:
+
+```bash
+python -m pip install -r requirements.txt
+python -m streamlit run streamlit_app.py
+```
+
+## connects to
+
+- `chip-supply-chain-map` for the upstream dependency graph that motivates wafer-sourcing stress tests.
+- `supplier-risk-rag-agent` for cited public-company risk text that can inform scenario assumptions.
+- `Robust-Facility-Location` for the shared uncertainty-modeling pattern.
+
 ## colophon
 
 operations research references and `ProjectReport.pdf` informed the formulation. the goal was to make robust and adaptive optimization tangible — not to reproduce the report appendix.
