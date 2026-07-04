@@ -16,6 +16,8 @@ DEFAULT_OUTPUT = Path("reports") / "scorecard.jsonl"
 FORMULATIONS = ("nominal", "box", "ellipsoidal")
 OPTIMAL_STATUS = "optimal"
 DELEGATE_ENV = "SCORECARD_NO_PYTHON_DELEGATE"
+# Mirrors the default lost_sales_penalty_frac in src/adaptive.py solve_two_stage.
+LOST_SALES_PENALTY_FRAC = 1.50
 
 PLANNED_FIELDS = (
     "robust_objective",
@@ -111,10 +113,16 @@ def _number(value: Any, field: str) -> float:
 
 
 def build_rows() -> list[dict[str, float | str]]:
+    import numpy as np
+
     create_default_instance, solve, generate_scenarios, evaluate_solution = _load_engine()
 
     instance = create_default_instance(demand=10_000_000)
     scenarios = generate_scenarios(instance, n_simulations=2000, seed=42)
+    price = _number(
+        instance.costs.selling_price_per_die,
+        "selling_price_per_die",
+    )
     rows: list[dict[str, float | str]] = []
 
     for formulation in FORMULATIONS:
@@ -130,12 +138,25 @@ def build_rows() -> list[dict[str, float | str]]:
             row[field] = _number(getattr(result, field), field)
         for field in REALIZED_FIELDS:
             row[field] = _number(getattr(sim, field), field)
+
+        shortfall = np.maximum(0.0, float(sim.demand) - sim.total_dies)
+        penalized_profit = sim.profits - LOST_SALES_PENALTY_FRAC * price * shortfall
+        row["profit_std"] = float(sim.profits.std())
+        row["penalized_worst_case_profit"] = float(penalized_profit.min())
         rows.append(row)
 
     nominal_worst = _number(rows[0]["worst_case_profit"], "nominal worst_case_profit")
+    nominal_penalized_worst = _number(
+        rows[0]["penalized_worst_case_profit"],
+        "nominal penalized_worst_case_profit",
+    )
     for row in rows:
         row["worst_case_delta"] = (
             _number(row["worst_case_profit"], "worst_case_profit") - nominal_worst
+        )
+        row["penalized_worst_case_delta"] = (
+            _number(row["penalized_worst_case_profit"], "penalized_worst_case_profit")
+            - nominal_penalized_worst
         )
 
     return rows
@@ -158,10 +179,16 @@ def main(argv: list[str] | None = None) -> int:
 
         output_path = _parse_args(argv)
         rows = write_scorecard(output_path)
-        best = max(rows, key=lambda row: _number(row["worst_case_profit"], "worst_case_profit"))
+        best = max(
+            rows,
+            key=lambda row: _number(
+                row["penalized_worst_case_profit"],
+                "penalized_worst_case_profit",
+            ),
+        )
         print(
             f"wrote {len(rows)} rows to {output_path}; "
-            f"best_worst_case_profit={best['formulation']}"
+            f"best_penalized_worst_case_profit={best['formulation']}"
         )
         return 0
     except ScorecardError as exc:
