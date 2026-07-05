@@ -22,6 +22,12 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pytest
 
+      - name: pytest
+        run: python -m pytest -q
+
+      - name: validate
+        run: python validate.py
+
       - name: compile python surfaces
         run: |
           python - <<'PY'
