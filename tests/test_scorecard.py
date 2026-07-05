@@ -45,11 +45,12 @@ def test_scorecard_shape_and_determinism():
 
         assert first_payload == second_payload
         assert rows == rows_again
-        assert len(rows) == 3
+        assert len(rows) == 4
         assert {row["formulation"] for row in rows} == {
             "nominal",
             "box",
             "ellipsoidal",
+            "adaptive",
         }
 
         for row in rows:
@@ -66,6 +67,7 @@ def test_robust_risk_metrics():
         nominal = by_formulation["nominal"]
         box = by_formulation["box"]
         ellipsoidal = by_formulation["ellipsoidal"]
+        adaptive = by_formulation["adaptive"]
 
         for row in rows:
             for column in RISK_COLUMNS:
@@ -74,9 +76,16 @@ def test_robust_risk_metrics():
 
         assert box["profit_std"] < nominal["profit_std"]
         assert ellipsoidal["profit_std"] < nominal["profit_std"]
+        assert adaptive["profit_std"] < nominal["profit_std"]
         assert box["penalized_worst_case_profit"] > nominal[
             "penalized_worst_case_profit"
         ]
         assert ellipsoidal["penalized_worst_case_profit"] > nominal[
+            "penalized_worst_case_profit"
+        ]
+        assert adaptive["penalized_worst_case_profit"] > nominal[
+            "penalized_worst_case_profit"
+        ]
+        assert box["penalized_worst_case_profit"] > adaptive[
             "penalized_worst_case_profit"
         ]
