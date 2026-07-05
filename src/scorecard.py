@@ -13,7 +13,7 @@ from typing import Any
 
 
 DEFAULT_OUTPUT = Path("reports") / "scorecard.jsonl"
-FORMULATIONS = ("nominal", "box", "ellipsoidal")
+FORMULATIONS = ("nominal", "box", "ellipsoidal", "adaptive")
 OPTIMAL_STATUS = "optimal"
 DELEGATE_ENV = "SCORECARD_NO_PYTHON_DELEGATE"
 # Mirrors the default lost_sales_penalty_frac in src/adaptive.py solve_two_stage.
@@ -132,6 +132,8 @@ def build_rows() -> list[dict[str, float | str]]:
                 f"{formulation} solve returned non-optimal status: {result.status}"
             )
 
+        # Adaptive is its first-stage plan evaluated through the same static
+        # lens as the other rows, which under-credits its salvage recourse.
         sim = evaluate_solution(result, instance, scenarios)
         row: dict[str, float | str] = {"formulation": formulation}
         for field in PLANNED_FIELDS:
