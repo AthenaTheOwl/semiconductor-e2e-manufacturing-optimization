@@ -77,7 +77,6 @@ app.py
 validate.py
 requirements.txt
 ProjectReport.pdf
-ROText.pdf
 src/
   model.py
   optimizer.py
