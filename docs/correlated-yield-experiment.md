@@ -11,4 +11,3 @@ Keep training scenarios separate from held-out evaluation draws when choosing un
 ## References
 
 - https://doi.org/10.1287/opre.1030.0065
-- https://github.com/3orionkings/ai-product-team/blob/main/workflows/process-change.md
