@@ -102,3 +102,7 @@ src/
 ## License
 
 MIT.
+
+## Method update
+
+[October method update: Stress the shared cause, then compare the sourcing policies](docs/correlated-yield-experiment.md).
