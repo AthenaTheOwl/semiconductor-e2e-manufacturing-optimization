@@ -685,8 +685,9 @@ with tab5:
     **5. Supplier diversification increases with uncertainty**
 
     Under higher uncertainty (larger Gamma/Rho), the robust optimizer diversifies across
-    both suppliers and both sourcing models. This multi-sourcing strategy provides natural
-    hedging against correlated supply disruptions.
+    both suppliers and both sourcing models. This multi-sourcing strategy provides hedging
+    against supplier-specific yield shocks (correlated shocks are not modeled; see
+    docs/correlated-yield-experiment.md).
     """)
 
     st.markdown("---")

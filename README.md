@@ -77,7 +77,6 @@ app.py
 validate.py
 requirements.txt
 ProjectReport.pdf
-ROText.pdf
 src/
   model.py
   optimizer.py
@@ -99,10 +98,10 @@ src/
 - The model is single-period.
 - Contract features, expedite options, and reputation effects are outside the current scope.
 
-## License
-
-MIT.
-
 ## Method update
 
 [October method update: Stress the shared cause, then compare the sourcing policies](docs/correlated-yield-experiment.md).
+
+## License
+
+MIT.
